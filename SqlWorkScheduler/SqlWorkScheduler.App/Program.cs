@@ -3,6 +3,7 @@ using SqlWorkScheduler.App.Actors;
 using SqlWorkScheduler.App.Messeges;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,16 @@ namespace SqlWorkScheduler.App
             var system = ActorSystem.Create("SqlWorkScheduler");
             var schedulerActor = system.ActorOf<WorkSchedulerActor>("WorkSchedulerActor");
 
-            schedulerActor.Tell(new ScheduleWorkCmd("select * from Orders", TimeSpan.FromSeconds(30), "localhost:80/api/orders"));
+            var connectionString = ConfigurationManager.ConnectionStrings["DefaultConnectionString"].ConnectionString;
+
+            //schedulerActor.Tell(
+            //    new ScheduleWorkCmd(
+            //        Guid.NewGuid().ToString(),
+            //        "select * from Orders",
+            //        connectionString,
+            //        5,
+            //        "localhost:80/api/orders"
+            //    ));
 
             //schedulerActor.
             //var cancel = system.Scheduler.ScheduleTellRepeatedlyCancelable(TimeSpan.FromSeconds(50), TimeSpan.FromSeconds(50), )

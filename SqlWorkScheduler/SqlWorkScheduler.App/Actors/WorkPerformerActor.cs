@@ -1,10 +1,13 @@
 ﻿using Akka.Actor;
+using ProtoBuf.Data;
 using SqlWorkScheduler.App.Messeges;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,6 +16,7 @@ namespace SqlWorkScheduler.App.Actors
     class WorkPerformerActor : ReceiveActor
     {
         private DateTime _lastRun;
+        private string _id;
         private string _sqlQuery;
         private string _endPoint;
 
@@ -34,8 +38,10 @@ namespace SqlWorkScheduler.App.Actors
         }
 
         #endregion
+
         private void ReceiveWorkerIntiationCmd(WorkerIntiationCmd cmd)
         {
+            _id = cmd.Id;
             _sqlQuery = cmd.SqlQuery;
             _endPoint = cmd.EndPoint;
 
@@ -54,11 +60,18 @@ namespace SqlWorkScheduler.App.Actors
                     var sqlCommand = new SqlCommand(_sqlQuery, sqlClient);
                     var sqlDataReader = sqlCommand.ExecuteReader();
 
-                    while(sqlDataReader.Read())
-                    {
-                        Console.WriteLine(sqlDataReader["OrderId"].ToString() + ": " + sqlDataReader["ShipCountry"].ToString());
-                    }
+                    var filePath = string.Format("./Serialized/{0}.txt", _id);
 
+                    var request = WebRequest.CreateHttp("http://localhost:3550");
+                    request.Method = "POST";
+                    var webStream = request.GetRequestStream();
+
+                    var protoStream = new ProtoDataStream(sqlDataReader);
+                    protoStream.CopyTo(webStream);
+                    webStream.Close();
+
+                    var response = request.GetResponse();
+                    
                     sqlClient.Close();
                 }
 

@@ -3,11 +3,11 @@ namespace SqlWorkScheduler.App.Messeges
 {
     public class CancelScheduledWorkCmd
     {
-        public Guid RefrenceGuid { get; private set; }
+        public string Id { get; private set; }
 
-        public CancelScheduledWorkCmd(Guid refrenceGuid)
+        public CancelScheduledWorkCmd(string id)
         {
-            RefrenceGuid = refrenceGuid;
+            Id = id;
         }
     }
 }
