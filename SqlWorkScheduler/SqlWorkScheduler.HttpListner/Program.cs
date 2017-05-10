@@ -23,7 +23,6 @@ namespace SqlWorkScheduler.HttpReceiver
                 {
                     try
                     {
-                        
                         var context = httpListner.GetContext();
                         var request = context.Request;
                         var response = context.Response;
@@ -37,7 +36,7 @@ namespace SqlWorkScheduler.HttpReceiver
                             {
                                 var stream = request.InputStream;
 
-                                string filePath = string.Format("./{0}.txt", Guid.NewGuid());
+                                string filePath = string.Format("./received/{0}.txt", Guid.NewGuid());
                                 var fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write);
 
                                 stream.CopyTo(fileStream);
