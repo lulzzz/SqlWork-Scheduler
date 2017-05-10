@@ -57,7 +57,6 @@ namespace SqlWorkScheduler.App.Actors
         {
             Receive<ScheduleWorkCmd>(cmd => ReceiveScheduleWorkCmd(cmd));
             Receive<CancelScheduledWorkCmd>(cmd => ReceiveCancelScheduledWorkCmd(cmd));
-            //Receive<GetAllScheduledWorkCmd>(cmd => ReceiveGetAllScheduledWorkCmd(cmd));
         }
 
         private void ReceiveScheduleWorkCmd(ScheduleWorkCmd cmd)

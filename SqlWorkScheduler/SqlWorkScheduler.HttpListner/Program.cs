@@ -40,7 +40,6 @@ namespace SqlWorkScheduler.HttpReceiver
                                 var fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write);
 
                                 stream.CopyTo(fileStream);
-                                fileStream.Flush();
                                 fileStream.Close();
                                 stream.Close();
                             }

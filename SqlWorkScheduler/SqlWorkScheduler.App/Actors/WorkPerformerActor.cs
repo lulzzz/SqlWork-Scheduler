@@ -99,23 +99,23 @@ namespace SqlWorkScheduler.App.Actors
                     var sqlQuery = _sqlQuery.Replace(_lastRunReplacement, "'" + _lastRun.ToString("yyyy-MM-dd h:mm:ss") + "'");
                     using (var sqlCommand = new SqlCommand(sqlQuery, sqlClient))
                     {
-                        var sqlDataReader = sqlCommand.ExecuteReader();
 
                         // web request
                         var request = WebRequest.CreateHttp(_endPoint);
                         request.Method = "POST";
 
-                        using (var webStream = request.GetRequestStream())
-                        {
-                            using (var protoStream = new ProtoDataStream(sqlDataReader))
-                            {
-                                protoStream.CopyTo(webStream);
-                                protoStream.Close();
-                            }
-                            webStream.Close();
-                        }
 
-                        sqlDataReader.Close();
+                        using (var reader = sqlCommand.ExecuteReader())
+                        {
+                            using (var webStream = request.GetRequestStream())
+                            {
+                                DataSerializer.Serialize(webStream, reader);
+                                webStream.Close();
+                                var response = request.GetResponse();
+                            }
+
+                            reader.Close();
+                        }
                     }
 
                     sqlClient.Close();
@@ -140,8 +140,6 @@ namespace SqlWorkScheduler.App.Actors
             {
                 Console.WriteLine("Error: {0}", e.Message);
             }
-
-
         }
     }
 }
