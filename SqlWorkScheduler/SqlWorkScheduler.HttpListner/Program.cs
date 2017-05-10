@@ -27,7 +27,7 @@ namespace SqlWorkScheduler.HttpReceiver
                         var request = context.Request;
                         var response = context.Response;
 
-                        response.StatusCode = 405;
+                        response.StatusCode = 405; // method not supported
 
                         if (request.HttpMethod == "POST")
                         {

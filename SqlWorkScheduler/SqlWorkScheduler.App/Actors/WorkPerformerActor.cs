@@ -81,8 +81,6 @@ namespace SqlWorkScheduler.App.Actors
             {
                 Console.WriteLine("Error: {0}", e.Message);
             }
-
-            Console.WriteLine("Test 1");
         }
     }
 }

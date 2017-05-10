@@ -13,14 +13,16 @@ namespace SqlWorkScheduler.App.Messeges
         public string SqlConnection { get; private set; }
         public int Interval { get; private set; }
         public string EndPoint { get; private set; }
+        public bool WriteToDisk { get; private set; }
 
-        public ScheduleWorkCmd(string id, string sqlQuery, string sqlConnection, int interval, string endpoint)
+        public ScheduleWorkCmd(string id, string sqlQuery, string sqlConnection, int interval, string endpoint, bool writeToDisk = true)
         {
             Id = id;
             SqlQuery = sqlQuery;
             SqlConnection = sqlConnection;
             Interval = interval;
             EndPoint = endpoint;
+            WriteToDisk = writeToDisk;
         }
     }
 }
