@@ -45,7 +45,7 @@ namespace SqlWorkScheduler.App.Actors
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine("Error: {0}", e.Message);
             }
@@ -67,7 +67,7 @@ namespace SqlWorkScheduler.App.Actors
                 var referenceGuid = cmd.Id;
                 var actor = Context.ActorOf<WorkPerformerActor>();
 
-                actor.Tell(new WorkerIntiationCmd(cmd.Id, cmd.SqlQuery, cmd.SqlConnection, cmd.EndPoint));
+                actor.Tell(new WorkerIntiationCmd(cmd.Id, cmd.SqlQuery, cmd.SqlConnection, cmd.Interval, cmd.EndPoint));
                 var cancelObject = Context.System.Scheduler.ScheduleTellRepeatedlyCancelable(TimeSpan.Zero, TimeSpan.FromMinutes(cmd.Interval), actor, new PerformWorkCmd(), Self);
 
                 var description = new WorkDescription()
@@ -80,17 +80,18 @@ namespace SqlWorkScheduler.App.Actors
                 if (cmd.WriteToDisk)
                 {
                     var fileName = string.Format("./ScheduledWork/{0}.txt", cmd.Id);
-                    var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-
-                    var fileContents = string.Format("{0}\r\n{1}\r\n{2}\r\n{3}\r\n",
-                        cmd.SqlQuery,
-                        cmd.SqlConnection,
-                        cmd.Interval,
-                        cmd.EndPoint
-                    );
-                    var bytes = Encoding.ASCII.GetBytes(fileContents);
-                    file.Write(bytes, 0, bytes.Length);
-                    file.Close();
+                    using (var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                    {
+                        var fileContents = string.Format("{0}\r\n{1}\r\n{2}\r\n{3}\r\n",
+                            cmd.SqlQuery,
+                            cmd.SqlConnection,
+                            cmd.Interval,
+                            cmd.EndPoint
+                        );
+                        var bytes = Encoding.ASCII.GetBytes(fileContents);
+                        file.Write(bytes, 0, bytes.Length);
+                        file.Close();
+                    }
                 }
 
                 _scheduledWork.Add(referenceGuid, description);
@@ -119,9 +120,9 @@ namespace SqlWorkScheduler.App.Actors
             }
         }
 
-        private void ReceiveGetAllScheduledWorkCmd(GetAllScheduledWorkCmd cmd)
-        {
+        //private void ReceiveGetAllScheduledWorkCmd(GetAllScheduledWorkCmd cmd)
+        //{
 
-        }
+        //}
     }
 }

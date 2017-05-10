@@ -22,7 +22,7 @@ namespace SqlWorkScheduler.App
             //schedulerActor.Tell(
             //    new ScheduleWorkCmd(
             //        Guid.NewGuid().ToString(),
-            //        "select * from Orders",
+            //        "select * from Orders where RequiredDate < {lastRun}",
             //        connectionString,
             //        5,
             //        "localhost:80/api/orders"
