@@ -26,14 +26,14 @@ namespace SqlWorkScheduler.App
 
             var connectionString = ConfigurationManager.ConnectionStrings["DefaultConnectionString"].ConnectionString;
 
-            StaticActors.SchedulerActor.Tell(
-                new ScheduleWorkCmd(
-                    Guid.NewGuid().ToString(),
-                    "select * from Orders where RequiredDate < {lastRun}",
-                    connectionString,
-                    5,
-                    "http://localhost:3550/"
-                ));
+            //StaticActors.SchedulerActor.Tell(
+            //    new ScheduleWorkCmd(
+            //        Guid.NewGuid().ToString(),
+            //        "select * from Orders where RequiredDate < {lastRun}",
+            //        connectionString,
+            //        5,
+            //        "http://localhost:3550/"
+            //    ));
 
             //schedulerActor.
             //var cancel = system.Scheduler.ScheduleTellRepeatedlyCancelable(TimeSpan.FromSeconds(50), TimeSpan.FromSeconds(50), )
