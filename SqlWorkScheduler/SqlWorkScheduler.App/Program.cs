@@ -32,7 +32,7 @@ namespace SqlWorkScheduler.App
                     "select * from Orders where RequiredDate < {lastRun}",
                     connectionString,
                     5,
-                    "localhost:80/api/orders"
+                    "http://localhost:3550/"
                 ));
 
             //schedulerActor.

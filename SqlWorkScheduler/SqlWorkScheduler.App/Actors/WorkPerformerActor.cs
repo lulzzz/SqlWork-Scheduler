@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.Data.SqlTypes;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -17,12 +18,8 @@ namespace SqlWorkScheduler.App.Actors
     {
         private string _lastRunReplacement { get { return ConfigurationManager.AppSettings["LastRunReplacement"]; } }
 
-        private DateTime _lastRun;
-        private string _id;
-        private string _sqlQuery;
-        private string _endPoint;
-        private string _sqlConnection;
-        private int _interval;
+        private long _lastRun;
+        private WorkerIntiationCmd _cmd;
 
         public WorkPerformerActor()
         {
@@ -30,6 +27,7 @@ namespace SqlWorkScheduler.App.Actors
         }
 
         #region states
+
         private void NotIntiated()
         {
             Receive<WorkerIntiationCmd>(cmd => ReceiveWorkerIntiationCmd(cmd));
@@ -44,42 +42,10 @@ namespace SqlWorkScheduler.App.Actors
 
         private void ReceiveWorkerIntiationCmd(WorkerIntiationCmd cmd)
         {
-            _id = cmd.Id;
+            _lastRun = cmd.LastRun;
+            _cmd = cmd;
 
-            var filePath = string.Format("./ScheduledWork/{0}.txt", _id);
-
-            //try
-            //{
-            //    if (File.Exists(filePath))
-            //    {
-            //        using (var file = File.Open(filePath, FileMode.Open, FileAccess.Read))
-            //        {
-            //            string contents;
-            //            using (var sr = new StreamReader(file))
-            //            {
-            //                contents = sr.ReadToEnd();
-            //            }
-
-            //            var arr = contents.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-
-            //            if (arr.Length == 5)
-            //            {
-            //                if (!string.IsNullOrEmpty(arr[4]))
-            //                {
-            //                    _lastRun = DateTime.Parse(arr[4]);
-            //                }
-            //                else
-            //                {
-            //                    _lastRun = DateTime.MinValue.AddYears(10);
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
-            //catch (Exception e)
-            //{
-            //    Console.WriteLine("Error: {0}", e.Message);
-            //}
+            var filePath = string.Format("./ScheduledWork/{0}.txt", _cmd.Id);
 
             Become(Intiated);
         }
@@ -88,18 +54,29 @@ namespace SqlWorkScheduler.App.Actors
         {
             try
             {
-                using (var sqlClient = new SqlConnection(_sqlConnection))
+                using (var sqlClient = new SqlConnection(_cmd.SqlConnection))
                 {
                     sqlClient.Open();
 
-                    var sqlQuery = _sqlQuery.Replace(_lastRunReplacement, "'" + _lastRun.ToString("yyyy-MM-dd h:mm:ss") + "'");
+                    string sqlQuery;
+                    if(_cmd.LastRun == 0)
+                    {
+                        sqlQuery = _cmd.SqlQuery.Replace(_lastRunReplacement, "'" + SqlDateTime.MinValue.ToSqlString().ToString() + "'");
+                    }
+                    else
+                    {
+                        var temp = new DateTime().AddTicks(_lastRun);
+                        var date = "'" + new SqlDateTime(temp).ToSqlString().ToString() + "'";
+
+                        sqlQuery = _cmd.SqlQuery.Replace(_lastRunReplacement, date);
+                    }
+
+                    
                     using (var sqlCommand = new SqlCommand(sqlQuery, sqlClient))
                     {
-
                         // web request
-                        var request = WebRequest.CreateHttp(_endPoint);
+                        var request = WebRequest.CreateHttp(_cmd.EndPoint);
                         request.Method = "POST";
-
 
                         using (var reader = sqlCommand.ExecuteReader())
                         {
@@ -116,21 +93,10 @@ namespace SqlWorkScheduler.App.Actors
 
                     sqlClient.Close();
                 }
-                _lastRun = DateTime.Now;
-                var filePath = string.Format("./ScheduledWork/{0}.txt", _id);
-                using (var file = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write))
-                {
-                    var fileContents = string.Format("{0}\r\n{1}\r\n{2}\r\n{3}\r\n{4}",
-                            _sqlQuery,
-                            _sqlConnection,
-                            _interval,
-                            _endPoint,
-                            _lastRun.ToString("yyyy-MM-dd h:mm:ss")
-                        );
-                    var bytes = Encoding.ASCII.GetBytes(fileContents);
-                    file.Write(bytes, 0, bytes.Length);
-                    file.Close();
-                }
+
+                _lastRun = DateTime.Now.Ticks;
+                StaticActors.SaveToDiskActor
+                    .Tell(new UpdateLastRunTickCmd(_cmd.Id, _lastRun));
             }
             catch (Exception e)
             {

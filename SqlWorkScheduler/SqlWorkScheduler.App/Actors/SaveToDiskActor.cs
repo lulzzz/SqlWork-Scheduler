@@ -32,15 +32,33 @@ namespace SqlWorkScheduler.App.Actors
 
         protected override void PreStart()
         {
-            using (var file = File.Open(_filePath, FileMode.Open, FileAccess.Read))
+            try
             {
-                _workItems = Serializer.Deserialize<Dictionary<string, WorkItem>>(file);
-            }
+                if (File.Exists(_filePath))
+                {
+                    using (var file = File.Open(_filePath, FileMode.Open, FileAccess.Read))
+                    {
+                        _workItems = Serializer.Deserialize<Dictionary<string, WorkItem>>(file);
+                        file.Close();
+                    }
 
-            foreach (var item in _workItems)
+                    foreach (var item in _workItems)
+                    {
+                        StaticActors.SchedulerActor
+                            .Tell(new ScheduleWorkCmd(item.Key, item.Value.SqlQuery, item.Value.SqlConnection, item.Value.Interval, item.Value.EndPoint, item.Value.LastRun, false));
+                    }
+                }
+                else
+                {
+                    using (var file = File.Create(_filePath))
+                        file.Close();
+
+                    _workItems = new Dictionary<string, WorkItem>();
+                }
+            }
+            catch (Exception e)
             {
-                StaticActors.SchedulerActor
-                    .Tell(new ScheduleWorkCmd(item.Key, item.Value.SqlQuery, item.Value.SqlConnection, item.Value.Interval, item.Value.EndPoint, false));
+                Console.WriteLine("Error: {0}", e.Message);
             }
 
             base.PreStart();
@@ -55,43 +73,68 @@ namespace SqlWorkScheduler.App.Actors
 
         private void ReceiveUpdateLastRunTickCmd(UpdateLastRunTickCmd cmd)
         {
-            _workItems[cmd.Id].LastRun = cmd.NewValue;
-
-            using (var file = File.Open(_filePath, FileMode.OpenOrCreate, FileAccess.Write))
+            try
             {
-                Serializer.Serialize(file, _workItems);
+                _workItems[cmd.Id].LastRun = cmd.NewValue;
+
+                using (var file = File.Open(_filePath, FileMode.OpenOrCreate, FileAccess.Write))
+                {
+                    Serializer.Serialize(file, _workItems);
+                    file.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: {0}", e.Message);
             }
         }
 
         private void ReceiveRemoveWorkItemFromDiskCmd(RemoveWorkItemFromDiskCmd cmd)
         {
-            var workItem = _workItems[cmd.Id];
-
-            if (workItem != null)
+            try
             {
-                _workItems.Remove(cmd.Id);
+                var workItem = _workItems[cmd.Id];
 
-                using (var file = File.Open(_filePath, FileMode.OpenOrCreate, FileAccess.Write))
+                if (workItem != null)
                 {
-                    Serializer.Serialize(file, _workItems);
+                    _workItems.Remove(cmd.Id);
+
+                    using (var file = File.Open(_filePath, FileMode.OpenOrCreate, FileAccess.Write))
+                    {
+                        Serializer.Serialize(file, _workItems);
+                        file.Close();
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: {0}", e.Message);
             }
         }
 
         private void ReceiveSaveWorkItemToDiskCmd(SaveWorkItemToDiskCmd cmd)
         {
-            var contract = new WorkItem()
+            try
             {
-                SqlQuery = cmd.SqlQuery,
-                SqlConnection = cmd.SqlConnection,
-                Interval = cmd.Interval,
-                LastRun = new DateTime().AddYears(1970).Ticks
-            };
-            _workItems.Add(cmd.Id, contract);
+                var contract = new WorkItem()
+                {
+                    SqlQuery = cmd.SqlQuery,
+                    SqlConnection = cmd.SqlConnection,
+                    Interval = cmd.Interval,
+                    LastRun = new DateTime().AddYears(1970).Ticks,
+                    EndPoint = cmd.EndPoint
+                };
+                _workItems.Add(cmd.Id, contract);
 
-            using (var file = File.Open(_filePath, FileMode.OpenOrCreate, FileAccess.Write))
+                using (var file = File.Open(_filePath, FileMode.OpenOrCreate, FileAccess.Write))
+                {
+                    Serializer.Serialize(file, _workItems);
+                    file.Close();
+                }
+            }
+            catch(Exception e)
             {
-                Serializer.Serialize(file, _workItems);
+                Console.WriteLine("Error: {0}", e.Message);
             }
         }
     }

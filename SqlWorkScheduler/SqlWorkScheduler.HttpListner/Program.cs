@@ -1,5 +1,8 @@
-﻿using System;
+﻿using ProtoBuf.Data;
+using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -32,27 +35,36 @@ namespace SqlWorkScheduler.HttpReceiver
                         if (request.HttpMethod == "POST")
                         {
 
-                            if(request.HasEntityBody)
+                            if (request.HasEntityBody)
                             {
                                 var stream = request.InputStream;
 
                                 string filePath = string.Format("./received/{0}.txt", Guid.NewGuid());
                                 var fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write);
 
-                                stream.CopyTo(fileStream);
-                                fileStream.Close();
-                                stream.Close();
+                                // Deserializing to a protobuf data reader
+                                using (var reader = DataSerializer.Deserialize(stream))
+                                {
+                                    while (reader.Read())
+                                    {
+                                        Console.WriteLine(reader["OrderId"] + " " + reader["CustomerId"]);
+                                    }
+
+                                    stream.CopyTo(fileStream);
+                                    fileStream.Close();
+                                    stream.Close();
+                                }
+
+                                response.StatusCode = 200;
+
+                                response.Headers.Add("Access-Control-Allow-Origin", "*");
+                                response.Headers.Add("Access-Control-Allow-Methods", "POST, GET");
                             }
 
-                            response.StatusCode = 200;
-
-                            response.Headers.Add("Access-Control-Allow-Origin", "*");
-                            response.Headers.Add("Access-Control-Allow-Methods", "POST, GET");
+                            response.Close();
                         }
-
-                        response.Close();
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         Console.WriteLine("Error: {0}", e.Message);
                         httpListner.Stop();

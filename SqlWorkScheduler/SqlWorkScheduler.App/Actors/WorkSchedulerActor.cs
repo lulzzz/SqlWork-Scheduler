@@ -66,7 +66,7 @@ namespace SqlWorkScheduler.App.Actors
                 var referenceGuid = cmd.Id;
                 var actor = Context.ActorOf<WorkPerformerActor>();
 
-                actor.Tell(new WorkerIntiationCmd(cmd.Id));
+                actor.Tell(new WorkerIntiationCmd(cmd.Id, cmd.SqlQuery, cmd.SqlConnection, cmd.EndPoint, cmd.LastRun));
                 var cancelObject = Context.System.Scheduler.ScheduleTellRepeatedlyCancelable(TimeSpan.Zero, TimeSpan.FromMinutes(cmd.Interval), actor, new PerformWorkCmd(), Self);
 
                 var description = new WorkDescription()
@@ -76,7 +76,7 @@ namespace SqlWorkScheduler.App.Actors
                     CancelObject = cancelObject
                 };
 
-                if (!cmd.SaveToDisk)
+                if (cmd.SaveToDisk)
                 {
                     StaticActors.SaveToDiskActor
                         .Tell(new SaveWorkItemToDiskCmd(cmd.Id, cmd.SqlQuery, cmd.SqlConnection, cmd.Interval, cmd.EndPoint));

@@ -14,8 +14,9 @@ namespace SqlWorkScheduler.App.Messeges
         public int Interval { get; private set; }
         public string EndPoint { get; private set; }
         public bool SaveToDisk { get; private set; }
+        public long LastRun { get; private set; }
 
-        public ScheduleWorkCmd(string id, string sqlQuery, string sqlConnection, int interval, string endpoint, bool saveToDisk = true)
+        public ScheduleWorkCmd(string id, string sqlQuery, string sqlConnection, int interval, string endpoint, long lastRun = 0, bool saveToDisk = true)
         {
             Id = id;
             SqlQuery = sqlQuery;
@@ -23,6 +24,7 @@ namespace SqlWorkScheduler.App.Messeges
             Interval = interval;
             EndPoint = endpoint;
             SaveToDisk = saveToDisk;
+            LastRun = lastRun;
         }
     }
 }
