@@ -74,7 +74,6 @@
     <Compile Include="Actors\WorkPerformerActor.cs" />
     <Compile Include="Actors\WorkSchedulerActor.cs" />
     <Compile Include="Messeges\CancelScheduledWorkCmd.cs" />
-    <Compile Include="Messeges\GetAllScheduledWorkCmd.cs" />
     <Compile Include="Messeges\ScheduleWorkCmd.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
