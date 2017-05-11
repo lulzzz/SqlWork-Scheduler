@@ -118,6 +118,8 @@ namespace SqlWorkScheduler.App.Actors
                 {
                     description.CancelObject.Cancel();
                     description.Actor.Tell(new StoppingSupervisorStrategy());
+
+                    StaticActors.SaveToDiskActor.Tell(new RemoveWorkItemFromDiskCmd(cmd.Id));
                 }
             }
             catch (Exception e)
