@@ -1,13 +1,12 @@
 ﻿namespace SqlWorkScheduler.App.Messeges
 {
-    public class WorkerIntiationCmd
+    public class RemoveWorkItemFromDiskCmd
     {
         public string Id { get; private set; }
 
-        public WorkerIntiationCmd(string id)
+        public RemoveWorkItemFromDiskCmd(string id)
         {
             Id = id;
-
         }
     }
 }

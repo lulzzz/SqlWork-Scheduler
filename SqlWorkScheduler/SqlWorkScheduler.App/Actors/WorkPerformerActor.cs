@@ -45,45 +45,41 @@ namespace SqlWorkScheduler.App.Actors
         private void ReceiveWorkerIntiationCmd(WorkerIntiationCmd cmd)
         {
             _id = cmd.Id;
-            _sqlQuery = cmd.SqlQuery;
-            _endPoint = cmd.EndPoint;
-            _sqlConnection = cmd.SqlConnection;
-            _interval = cmd.Interval;
 
             var filePath = string.Format("./ScheduledWork/{0}.txt", _id);
 
-            try
-            {
-                if (File.Exists(filePath))
-                {
-                    using (var file = File.Open(filePath, FileMode.Open, FileAccess.Read))
-                    {
-                        string contents;
-                        using (var sr = new StreamReader(file))
-                        {
-                            contents = sr.ReadToEnd();
-                        }
+            //try
+            //{
+            //    if (File.Exists(filePath))
+            //    {
+            //        using (var file = File.Open(filePath, FileMode.Open, FileAccess.Read))
+            //        {
+            //            string contents;
+            //            using (var sr = new StreamReader(file))
+            //            {
+            //                contents = sr.ReadToEnd();
+            //            }
 
-                        var arr = contents.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            //            var arr = contents.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
-                        if (arr.Length == 5)
-                        {
-                            if (!string.IsNullOrEmpty(arr[4]))
-                            {
-                                _lastRun = DateTime.Parse(arr[4]);
-                            }
-                            else
-                            {
-                                _lastRun = DateTime.MinValue.AddYears(10);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error: {0}", e.Message);
-            }
+            //            if (arr.Length == 5)
+            //            {
+            //                if (!string.IsNullOrEmpty(arr[4]))
+            //                {
+            //                    _lastRun = DateTime.Parse(arr[4]);
+            //                }
+            //                else
+            //                {
+            //                    _lastRun = DateTime.MinValue.AddYears(10);
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine("Error: {0}", e.Message);
+            //}
 
             Become(Intiated);
         }
