@@ -47,7 +47,7 @@ namespace SqlWorkScheduler.HttpReceiver
                                 {
                                     while (reader.Read())
                                     {
-                                        Console.WriteLine(reader["OrderId"] + " " + reader["CustomerId"]);
+                                        //Console.WriteLine(reader["OrderId"] + " " + reader["CustomerId"]);
                                     }
 
                                     stream.CopyTo(fileStream);

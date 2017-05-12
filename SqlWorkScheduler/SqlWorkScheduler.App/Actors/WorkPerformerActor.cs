@@ -19,7 +19,7 @@ namespace SqlWorkScheduler.App.Actors
         private string _lastRunReplacement { get { return ConfigurationManager.AppSettings["LastRunReplacement"]; } }
 
         private long _lastRun;
-        private WorkerIntiationCmd _cmd;
+        private ScheduleWorkCmd _cmd;
 
         public WorkPerformerActor()
         {
@@ -42,8 +42,8 @@ namespace SqlWorkScheduler.App.Actors
 
         private void ReceiveWorkerIntiationCmd(WorkerIntiationCmd cmd)
         {
-            _lastRun = cmd.LastRun;
-            _cmd = cmd;
+            _lastRun = cmd.ScheduleCommand.LastRun;
+            _cmd = cmd.ScheduleCommand;
 
             var filePath = string.Format("./ScheduledWork/{0}.txt", _cmd.Id);
 
@@ -59,7 +59,7 @@ namespace SqlWorkScheduler.App.Actors
                     sqlClient.Open();
 
                     string sqlQuery;
-                    if(_cmd.LastRun == 0)
+                    if (_cmd.LastRun == 0)
                     {
                         sqlQuery = _cmd.SqlQuery.Replace(_lastRunReplacement, "'" + SqlDateTime.MinValue.ToSqlString().ToString() + "'");
                     }
@@ -71,9 +71,22 @@ namespace SqlWorkScheduler.App.Actors
                         sqlQuery = _cmd.SqlQuery.Replace(_lastRunReplacement, date);
                     }
 
-                    
+
                     using (var sqlCommand = new SqlCommand(sqlQuery, sqlClient))
                     {
+                        if (_cmd.SpParameters != null)
+                        {
+                            if (_cmd.SpParameters.Count > 0)
+                            {
+                                sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+
+                                foreach (var parameter in _cmd.SpParameters)
+                                {
+                                    sqlCommand.Parameters.Add(new SqlParameter(parameter.Key, parameter.Value));
+                                }
+                            }
+                        }
+
                         // web request
                         var request = WebRequest.CreateHttp(_cmd.EndPoint);
                         request.Method = "POST";

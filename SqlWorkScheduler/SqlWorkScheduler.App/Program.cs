@@ -4,6 +4,7 @@ using SqlWorkScheduler.App.Messeges;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,17 +27,29 @@ namespace SqlWorkScheduler.App
 
             var connectionString = ConfigurationManager.ConnectionStrings["DefaultConnectionString"].ConnectionString;
 
+            var parameters = new Dictionary<string, string>() {
+                        { "@CategoryName", "Beverages" },
+                        { "@OrdYear", "1998" }
+                    };
+
             //StaticActors.SchedulerActor.Tell(
             //    new ScheduleWorkCmd(
             //        Guid.NewGuid().ToString(),
-            //        "select * from Orders where RequiredDate < {lastRun}",
+            //        "SalesByCategory",
             //        connectionString,
             //        5,
-            //        "http://localhost:3550/"
+            //        "http://localhost:3550/",
+            //        parameters
             //    ));
 
-            //schedulerActor.
-            //var cancel = system.Scheduler.ScheduleTellRepeatedlyCancelable(TimeSpan.FromSeconds(50), TimeSpan.FromSeconds(50), )
+            //StaticActors.SchedulerActor.Tell(
+            //    new ScheduleWorkCmd(
+            //        Guid.NewGuid().ToString(),
+            //        "select * from Orders",
+            //        connectionString,
+            //        1,
+            //        "http://localhost:3550/"
+            //    ));
 
             Console.ReadLine();
         }
