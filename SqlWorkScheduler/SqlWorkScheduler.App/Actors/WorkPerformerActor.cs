@@ -1,16 +1,11 @@
 ﻿using Akka.Actor;
 using ProtoBuf.Data;
-using SqlWorkScheduler.App.Messeges;
+using SqlWorkScheduler.Core.Messeges;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
-using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SqlWorkScheduler.App.Actors
 {

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SqlWorkScheduler.App.Messeges
+namespace SqlWorkScheduler.Core.Messeges
 {
     public class ScheduleWorkCmd
     {

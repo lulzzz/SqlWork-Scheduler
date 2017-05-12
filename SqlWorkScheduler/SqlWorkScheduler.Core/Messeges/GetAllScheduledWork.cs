@@ -1,4 +1,4 @@
-﻿namespace SqlWorkScheduler.App.Actors
+﻿namespace SqlWorkScheduler.Core.Actors
 {
     public class GetAllWorkItemsOnDiskCmd
     {

@@ -42,17 +42,24 @@ namespace SqlWorkScheduler.HttpReceiver
                                 string filePath = string.Format("./received/{0}.txt", Guid.NewGuid());
                                 var fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write);
 
-                                // Deserializing to a protobuf data reader
-                                using (var reader = DataSerializer.Deserialize(stream))
+                                var dt = new DataTable();
+                                // Deserializing to a protobuf data reader and loading that into a datatable
+                                using (IDataReader reader = DataSerializer.Deserialize(stream))
                                 {
-                                    while (reader.Read())
-                                    {
-                                        //Console.WriteLine(reader["OrderId"] + " " + reader["CustomerId"]);
-                                    }
-
+                                    dt.Load(reader);
+                                    //Console.WriteLine(reader["OrderId"] + " " + reader["CustomerId"]);
                                     stream.CopyTo(fileStream);
                                     fileStream.Close();
                                     stream.Close();
+                                }
+
+                                if(dt != null)
+                                {
+                                    foreach (var key in dt.Columns)
+                                    {
+                                        Console.Write(key + ",");
+                                    }
+                                    Console.WriteLine();
                                 }
 
                                 response.StatusCode = 200;

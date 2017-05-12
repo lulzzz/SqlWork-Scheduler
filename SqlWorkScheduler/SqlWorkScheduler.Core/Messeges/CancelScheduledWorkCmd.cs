@@ -1,5 +1,5 @@
 ﻿using System;
-namespace SqlWorkScheduler.App.Messeges
+namespace SqlWorkScheduler.Core.Messeges
 {
     public class CancelScheduledWorkCmd
     {
