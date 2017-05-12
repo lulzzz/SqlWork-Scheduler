@@ -67,18 +67,20 @@
     <Compile Include="Actors\SaveToDiskActor.cs" />
     <Compile Include="Actors\WorkPerformerActor.cs" />
     <Compile Include="Actors\WorkSchedulerActor.cs" />
+    <Compile Include="Messeges\CancelScheduledWorkCmd.cs" />
+    <Compile Include="Messeges\GetAllScheduledWork.cs" />
+    <Compile Include="Messeges\PerformWorkCmd.cs" />
+    <Compile Include="Messeges\RemoveScheduledWork.cs" />
+    <Compile Include="Messeges\SaveWorkItemToDiskCmd.cs" />
+    <Compile Include="Messeges\ScheduleWorkCmd.cs" />
+    <Compile Include="Messeges\UpdateLastRunTick.cs" />
+    <Compile Include="Messeges\WorkerIntiationCmd.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SqlWorkScheduler.Core\SqlWorkScheduler.Core.csproj">
-      <Project>{1925DA57-AC89-4FFB-9A16-9F57428E65C0}</Project>
-      <Name>SqlWorkScheduler.Core</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
