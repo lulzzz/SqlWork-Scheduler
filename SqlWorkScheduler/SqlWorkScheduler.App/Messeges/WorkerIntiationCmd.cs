@@ -1,6 +1,6 @@
 ﻿using System.Data.SqlClient;
 
-namespace SqlWorkScheduler.Core.Messeges
+namespace SqlWorkScheduler.App.Messeges
 {
     public class WorkerIntiationCmd
     {

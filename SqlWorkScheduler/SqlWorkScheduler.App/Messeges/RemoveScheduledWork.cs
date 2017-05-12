@@ -1,4 +1,4 @@
-﻿namespace SqlWorkScheduler.Core.Messeges
+﻿namespace SqlWorkScheduler.App.Messeges
 {
     public class RemoveWorkItemFromDiskCmd
     {

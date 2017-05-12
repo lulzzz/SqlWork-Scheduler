@@ -1,6 +1,6 @@
 ﻿using Akka.Actor;
 using ProtoBuf;
-using SqlWorkScheduler.Core.Messeges;
+using SqlWorkScheduler.App.Messeges;
 using System;
 using System.Collections.Generic;
 using System.IO;
