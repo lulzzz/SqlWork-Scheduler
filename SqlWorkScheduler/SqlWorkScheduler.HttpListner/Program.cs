@@ -34,23 +34,24 @@ namespace SqlWorkScheduler.HttpReceiver
 
                         if (request.HttpMethod == "POST")
                         {
-
                             if (request.HasEntityBody)
                             {
                                 var stream = request.InputStream;
 
                                 string filePath = string.Format("./received/{0}.txt", Guid.NewGuid());
-                                var fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write);
-
                                 var dt = new DataTable();
-                                // Deserializing to a protobuf data reader and loading that into a datatable
-                                using (IDataReader reader = DataSerializer.Deserialize(stream))
+                                using (var fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write))
                                 {
-                                    dt.Load(reader);
-                                    //Console.WriteLine(reader["OrderId"] + " " + reader["CustomerId"]);
-                                    stream.CopyTo(fileStream);
-                                    fileStream.Close();
-                                    stream.Close();
+                                    
+                                    // Deserializing to a protobuf data reader and loading that into a datatable
+                                    using (IDataReader reader = DataSerializer.Deserialize(stream))
+                                    {
+                                        dt.Load(reader);
+                                        //Console.WriteLine(reader["OrderId"] + " " + reader["CustomerId"]);
+                                        stream.CopyTo(fileStream);
+                                        fileStream.Close();
+                                        stream.Close();
+                                    }
                                 }
 
                                 if(dt != null)
@@ -65,7 +66,7 @@ namespace SqlWorkScheduler.HttpReceiver
                                 response.StatusCode = 200;
 
                                 response.Headers.Add("Access-Control-Allow-Origin", "*");
-                                response.Headers.Add("Access-Control-Allow-Methods", "POST, GET");
+                                response.Headers.Add("Access-Control-Allow-Methods", "POST");
                             }
 
                             response.Close();

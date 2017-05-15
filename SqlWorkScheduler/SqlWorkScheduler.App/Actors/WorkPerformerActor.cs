@@ -1,11 +1,13 @@
 ﻿using Akka.Actor;
 using ProtoBuf.Data;
-using SqlWorkScheduler.Core.Messeges;
+using SqlWorkScheduler.App.Messeges;
 using System;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
+using System.IO;
 using System.Net;
+using System.Text;
 
 namespace SqlWorkScheduler.App.Actors
 {
@@ -39,10 +41,15 @@ namespace SqlWorkScheduler.App.Actors
         {
             _lastRun = cmd.ScheduleCommand.LastRun;
             _cmd = cmd.ScheduleCommand;
-
-            var filePath = string.Format("./ScheduledWork/{0}.txt", _cmd.Id);
-
             Become(Intiated);
+
+            using (var file = File.Open("./test.bin", FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            {
+                var bytes = Encoding.ASCII.GetBytes("test");
+
+                file.Write(bytes, 0, bytes.Length);
+                file.Close();
+            }
         }
 
         private void ReceivePerformWorkCmd(PerformWorkCmd cmd)
@@ -71,13 +78,13 @@ namespace SqlWorkScheduler.App.Actors
                     {
                         if (_cmd.SpParameters != null)
                         {
-                            if (_cmd.SpParameters.Count > 0)
+                            if (_cmd.SpParameters.Length > 0)
                             {
                                 sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
 
                                 foreach (var parameter in _cmd.SpParameters)
                                 {
-                                    sqlCommand.Parameters.Add(new SqlParameter(parameter.Key, parameter.Value));
+                                    sqlCommand.Parameters.Add(new SqlParameter(parameter.ParameterName, parameter.ParameterValue));
                                 }
                             }
                         }

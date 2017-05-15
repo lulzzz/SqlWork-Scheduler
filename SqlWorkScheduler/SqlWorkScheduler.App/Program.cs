@@ -17,7 +17,10 @@ namespace SqlWorkScheduler.App
         static void Main(string[] args)
         {
             var system = ActorSystem.Create("SqlWorkScheduler");
-            StaticActors.SchedulerActor = system.ActorOf<WorkSchedulerActor>("WorkSchedulerActor");
+
+            var props = Props.Create(() => new WorkSchedulerActor());
+
+            StaticActors.SchedulerActor = system.ActorOf(props, "WorkSchedulerActor");
             StaticActors.SaveToDiskActor = system.ActorOf<SaveToDiskActor>("SaveToDiskActor");
 
             var connectionString = ConfigurationManager.ConnectionStrings["DefaultConnectionString"].ConnectionString;

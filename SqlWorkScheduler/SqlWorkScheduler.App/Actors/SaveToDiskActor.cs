@@ -1,5 +1,6 @@
 ﻿using Akka.Actor;
 using ProtoBuf;
+using SqlWorkScheduler.App.Contracts;
 using SqlWorkScheduler.App.Messeges;
 using System;
 using System.Collections.Generic;
@@ -7,28 +8,6 @@ using System.IO;
 
 namespace SqlWorkScheduler.App.Actors
 {
-    //class WorkItem
-    //{
-
-    //}
-
-    [ProtoContract]
-    class SqlWorkItem
-    {
-        [ProtoMember(1)]
-        public string SqlQuery { get; set; }
-        [ProtoMember(2)]
-        public string SqlConnection { get; set; }
-        [ProtoMember(3)]
-        public int Interval { get; set; }
-        [ProtoMember(4)]
-        public string EndPoint { get; set; }
-        [ProtoMember(5)]
-        public long LastRun { get; set; }
-        [ProtoMember(6)]
-        public Dictionary<string, string> SpParameters { get; set; }
-    }
-
     class SaveToDiskActor : ReceiveActor
     {
         private Dictionary<string, SqlWorkItem> _workItems;
@@ -46,7 +25,6 @@ namespace SqlWorkScheduler.App.Actors
                         file.Close();
                     }
 
-                    // STOP HERE, dumb
                     foreach (var item in _workItems)
                     {
                         StaticActors.SchedulerActor

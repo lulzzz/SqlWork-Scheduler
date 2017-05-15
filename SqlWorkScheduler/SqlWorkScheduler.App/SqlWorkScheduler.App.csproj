@@ -67,8 +67,9 @@
     <Compile Include="Actors\SaveToDiskActor.cs" />
     <Compile Include="Actors\WorkPerformerActor.cs" />
     <Compile Include="Actors\WorkSchedulerActor.cs" />
+    <Compile Include="Contracts\SpParameter.cs" />
+    <Compile Include="Contracts\SqlWorkItem.cs" />
     <Compile Include="Messeges\CancelScheduledWorkCmd.cs" />
-    <Compile Include="Messeges\GetAllScheduledWork.cs" />
     <Compile Include="Messeges\PerformWorkCmd.cs" />
     <Compile Include="Messeges\RemoveScheduledWork.cs" />
     <Compile Include="Messeges\SaveWorkItemToDiskCmd.cs" />

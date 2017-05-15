@@ -1,5 +1,5 @@
 ﻿using Akka.Actor;
-using SqlWorkScheduler.Core.Messeges;
+using SqlWorkScheduler.App.Messeges;
 using System;
 using System.Collections.Generic;
 
@@ -7,7 +7,7 @@ namespace SqlWorkScheduler.App.Actors
 {
     class WorkDescription
     {
-        public ScheduleWorkCmd Command { get; set; }
+        //public ScheduleWorkCmd Command { get; set; }
         public IActorRef Actor { get; set; }
         public ICancelable CancelObject { get; set; }
     }
@@ -41,7 +41,6 @@ namespace SqlWorkScheduler.App.Actors
 
                 var description = new WorkDescription()
                 {
-                    Command = cmd,
                     Actor = actor,
                     CancelObject = cancelObject
                 };
@@ -51,24 +50,6 @@ namespace SqlWorkScheduler.App.Actors
                     StaticActors.SaveToDiskActor
                         .Tell(new SaveWorkItemToDiskCmd(cmd));
                 }
-
-
-                //if (cmd.WriteToDisk)
-                //{
-                //    var fileName = string.Format("./ScheduledWork/{0}.txt", cmd.Id);
-                //    using (var file = File.Open(fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                //    {
-                //        var fileContents = string.Format("{0}\r\n{1}\r\n{2}\r\n{3}\r\n",
-                //            cmd.SqlQuery,
-                //            cmd.SqlConnection,
-                //            cmd.Interval,
-                //            cmd.EndPoint
-                //        );
-                //        var bytes = Encoding.ASCII.GetBytes(fileContents);
-                //        file.Write(bytes, 0, bytes.Length);
-                //        file.Close();
-                //    }
-                //}
 
                 _scheduledWork.Add(referenceGuid, description);
             }
