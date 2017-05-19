@@ -11,7 +11,7 @@ namespace SqlWorkScheduler.App.Messeges
         public string SqlConnection { get; private set; }
         public int Interval { get; private set; }
         public string EndPoint { get; private set; }
-        public SpParameter[] SpParameters { get; set; }
+        public SpParameter[] SpParameters { get; private set; }
         public bool SaveToDisk { get; private set; }
         public long LastRun { get; private set; }
 

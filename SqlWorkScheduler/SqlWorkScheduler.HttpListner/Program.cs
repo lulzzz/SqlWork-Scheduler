@@ -1,4 +1,7 @@
-﻿using ProtoBuf.Data;
+﻿using Akka.Actor;
+using ProtoBuf.Data;
+using SqlWorkScheduler.HttpReceiver.Actors;
+using SqlWorkScheduler.HttpReceiver.Messages;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,10 +14,19 @@ using System.Threading.Tasks;
 
 namespace SqlWorkScheduler.HttpReceiver
 {
+    public class StaticActor
+    {
+        public static IActorRef DataReaderHandlerActor { get; set; }
+    }
     class Program
     {
         static void Main(string[] args)
         {
+            var system = ActorSystem.Create("ArticleManagerSystem");
+
+            StaticActor.DataReaderHandlerActor = system.ActorOf<DataReaderHandlerActor>("ArticleReceiveActor");
+
+
             if (HttpListener.IsSupported)
             {
                 var httpListner = new HttpListener();
@@ -37,31 +49,10 @@ namespace SqlWorkScheduler.HttpReceiver
                             if (request.HasEntityBody)
                             {
                                 var stream = request.InputStream;
-
-                                string filePath = string.Format("./received/{0}.txt", Guid.NewGuid());
                                 var dt = new DataTable();
-                                using (var fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write))
-                                {
-                                    
-                                    // Deserializing to a protobuf data reader and loading that into a datatable
-                                    using (IDataReader reader = DataSerializer.Deserialize(stream))
-                                    {
-                                        dt.Load(reader);
-                                        //Console.WriteLine(reader["OrderId"] + " " + reader["CustomerId"]);
-                                        stream.CopyTo(fileStream);
-                                        fileStream.Close();
-                                        stream.Close();
-                                    }
-                                }
+                                dt.Load(DataSerializer.Deserialize(stream));
 
-                                if(dt != null)
-                                {
-                                    foreach (var key in dt.Columns)
-                                    {
-                                        Console.Write(key + ",");
-                                    }
-                                    Console.WriteLine();
-                                }
+                                StaticActor.DataReaderHandlerActor.Tell(new ProcessDataCmd(dt));
 
                                 response.StatusCode = 200;
 

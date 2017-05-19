@@ -42,14 +42,6 @@ namespace SqlWorkScheduler.App.Actors
             _lastRun = cmd.ScheduleCommand.LastRun;
             _cmd = cmd.ScheduleCommand;
             Become(Intiated);
-
-            using (var file = File.Open("./test.bin", FileMode.OpenOrCreate, FileAccess.ReadWrite))
-            {
-                var bytes = Encoding.ASCII.GetBytes("test");
-
-                file.Write(bytes, 0, bytes.Length);
-                file.Close();
-            }
         }
 
         private void ReceivePerformWorkCmd(PerformWorkCmd cmd)
